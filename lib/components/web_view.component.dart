@@ -38,7 +38,6 @@ class _WebViewComponentState extends State<WebViewComponent> {
                 widget.storageUtil.readHtmlFile().then((html) {
                   webViewController.loadHtmlString(html);
                 });
-                webViewController.runJavascript(widget.jsNotifier.value);
               });
             },
             onPageStarted: (url) {
@@ -52,6 +51,13 @@ class _WebViewComponentState extends State<WebViewComponent> {
               });
             },
             onPageFinished: (url) {
+              widget.webViewController.future.then((webViewController) async {
+                webViewController.runJavascriptReturningResult(widget.jsNotifier.value).then((result) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Console output: $result', style: const TextStyle(fontFamily: 'monospace', fontSize: 15)),
+                  ));
+                });
+              });
               setState(() {
                 loadingPercentage = 100;
               });
