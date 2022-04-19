@@ -10,7 +10,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 OrientationType orientationType = OrientationType();
 StorageUtil storageUtil = StorageUtil();
 
-Widget card(
+Widget editorsCard(
     TextEditingController htmlController,
     ValueNotifier<String> htmlNotifier,
     TextEditingController cssController,
@@ -27,6 +27,8 @@ Widget card(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+            cardTitle(),
+            xsSpacing(orientationType.Vertical),
             title('HTML'),
             xsSpacing(orientationType.Vertical),
             htmlInputBox(htmlController, htmlNotifier),
@@ -42,6 +44,19 @@ Widget card(
             runButton(htmlNotifier, cssNotifier, jsNotifier, context),
           ],
         ),
+      ),
+    ),
+  );
+}
+
+Widget cardTitle() {
+  return Container(
+    padding: const EdgeInsets.all(8.0),
+    child: const Text(
+      'HTML & CSS & JS Card',
+      style: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
       ),
     ),
   );
@@ -122,7 +137,7 @@ Widget runButton(
       storageUtil.writeHtml(newHtml);
 
       Completer<WebViewController> webViewController = Completer<WebViewController>();
-      Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewComponent(webViewController: webViewController, storageUtil: storageUtil, jsNotifier: jsNotifier)));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewComponent(webViewController: webViewController, type: 'editors', storageUtil: storageUtil, jsNotifier: jsNotifier, urlNotifier: ValueNotifier(''))));
     },
   );
 }

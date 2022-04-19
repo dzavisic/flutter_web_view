@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_web_view_private/components/card.component.dart';
+import 'package:flutter_web_view_private/components/editors_card.component.dart';
+import 'package:flutter_web_view_private/components/url_card.component.dart';
+import 'package:flutter_web_view_private/shared/interfaces/orientation.interface.dart';
 import 'package:flutter_web_view_private/shared/utils/storage.dart';
+import 'package:flutter_web_view_private/shared/widgets/spacing.widget.dart';
 
 class HomeComponent extends StatefulWidget {
   const HomeComponent({Key? key, required this.title}) : super(key: key);
@@ -37,12 +40,15 @@ class _HomeComponentState extends State<HomeComponent> {
 
   StorageUtil storageUtil = StorageUtil();
 
+  ValueNotifier<String> urlNotifier = ValueNotifier<String>('');
+  TextEditingController urlController = TextEditingController();
   ValueNotifier<String> htmlNotifier = ValueNotifier<String>('');
   TextEditingController htmlController = TextEditingController();
   ValueNotifier<String> cssNotifier = ValueNotifier<String>('');
   TextEditingController cssController = TextEditingController();
   ValueNotifier<String> jsNotifier = ValueNotifier<String>('');
   TextEditingController jsController = TextEditingController();
+  OrientationType orientationType = OrientationType();
 
   @override
   void initState() {
@@ -65,18 +71,24 @@ class _HomeComponentState extends State<HomeComponent> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Column(
-        children: <Widget>[
-          card(
-            htmlController,
-            htmlNotifier,
-            cssController,
-            cssNotifier,
-            jsController,
-            jsNotifier,
-            context
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            /// RUN WEB VIEW FROM URL
+            urlCard(urlController, urlNotifier, jsController, jsNotifier, context),
+            sSpacing(orientationType.Vertical),
+            /// HTML, CSS and JS editors
+            editorsCard(
+              htmlController,
+              htmlNotifier,
+              cssController,
+              cssNotifier,
+              jsController,
+              jsNotifier,
+              context
+            ),
+          ],
+        ),
       ),
     );
   }

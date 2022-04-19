@@ -6,11 +6,13 @@ import 'package:flutter_web_view_private/shared/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewComponent extends StatefulWidget {
-  const WebViewComponent({Key? key, required this.webViewController, required this.storageUtil, required this.jsNotifier}) : super(key: key);
+  const WebViewComponent({Key? key, required this.webViewController, required this.storageUtil, required this.type, required this.jsNotifier, required this.urlNotifier}) : super(key: key);
 
   final Completer<WebViewController> webViewController;
   final StorageUtil storageUtil;
   final ValueNotifier<String> jsNotifier;
+  final String type;
+  final ValueNotifier<String> urlNotifier;
 
   @override
   State<WebViewComponent> createState() => _WebViewComponentState();
@@ -32,13 +34,16 @@ class _WebViewComponentState extends State<WebViewComponent> {
       body: Stack(
         children: [
           WebView(
+            initialUrl: widget.type == 'url' ? widget.urlNotifier.value : null,
             onWebViewCreated: (webViewController) {
               widget.webViewController.complete(webViewController);
-              widget.webViewController.future.then((webViewController) async {
-                widget.storageUtil.readHtmlFile().then((html) {
-                  webViewController.loadHtmlString(html);
+              if (widget.type == 'editors') {
+                widget.webViewController.future.then((webViewController) async {
+                  widget.storageUtil.readHtmlFile().then((html) {
+                    webViewController.loadHtmlString(html);
+                  });
                 });
-              });
+              }
             },
             onPageStarted: (url) {
               setState(() {
@@ -51,13 +56,15 @@ class _WebViewComponentState extends State<WebViewComponent> {
               });
             },
             onPageFinished: (url) {
-              widget.webViewController.future.then((webViewController) async {
-                webViewController.runJavascriptReturningResult(widget.jsNotifier.value).then((result) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Console output: $result', style: const TextStyle(fontFamily: 'monospace', fontSize: 15)),
-                  ));
+              if (widget.jsNotifier.value.isNotEmpty) {
+                widget.webViewController.future.then((webViewController) async {
+                  webViewController.runJavascriptReturningResult(widget.jsNotifier.value).then((result) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Console output: $result', style: const TextStyle(fontFamily: 'monospace', fontSize: 15)),
+                    ));
+                  });
                 });
-              });
+              }
               setState(() {
                 loadingPercentage = 100;
               });
