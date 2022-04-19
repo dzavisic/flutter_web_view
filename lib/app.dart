@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Web View'),
+      home: const HomeComponent(title: 'Flutter Web View'),
     );
   }
 }
