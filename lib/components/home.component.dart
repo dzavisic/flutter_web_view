@@ -63,6 +63,15 @@ class _HomeComponentState extends State<HomeComponent> {
 
     cssNotifier.value = cssTemplate;
     cssController.text = cssTemplate;
+
+    urlNotifier.value = 'https://github.com/Jaspero';
+    urlController.text = 'https://github.com/Jaspero';
+
+    jsNotifier.value = '1 + 2';
+    jsController.text = '1 + 2';
+
+    customJsNotifier.value = 'function callAlert(message) { alert(message); }';
+    customJsController.text = 'function callAlert(message) { alert(message); }';
   }
 
   @override
