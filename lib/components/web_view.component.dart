@@ -24,7 +24,6 @@ class _WebViewComponentState extends State<WebViewComponent> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.expectResult.value);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Web View'),
