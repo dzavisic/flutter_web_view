@@ -2,4 +2,4 @@
 
 ## Preview
 
-<img src="assets/flutter_web_view.gif" alt="drawing" width="200"/>
+<img src="assets/flutter_web_view_.gif" alt="drawing" width="200"/>
