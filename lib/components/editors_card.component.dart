@@ -15,8 +15,8 @@ Widget editorsCard(
     ValueNotifier<String> htmlNotifier,
     TextEditingController cssController,
     ValueNotifier<String> cssNotifier,
-    TextEditingController jsController,
-    ValueNotifier<String> jsNotifier,
+    TextEditingController customJsController,
+    ValueNotifier<String> customJsNotifier,
     BuildContext context,
     ) {
   return Padding(
@@ -37,11 +37,11 @@ Widget editorsCard(
             xsSpacing(orientationType.Vertical),
             cssInputBox(cssController, cssNotifier),
             sSpacing(orientationType.Vertical),
-            title('JS'),
+            title('JS (Custom)'),
             xsSpacing(orientationType.Vertical),
-            jsInputBox(jsController, jsNotifier),
+            jsInputBox(customJsController, customJsNotifier),
             xsSpacing(orientationType.Vertical),
-            runButton(htmlNotifier, cssNotifier, jsNotifier, context),
+            runButton(htmlNotifier, cssNotifier, customJsNotifier, context),
           ],
         ),
       ),
@@ -108,13 +108,13 @@ Widget cssInputBox(
 }
 
 Widget jsInputBox(
-    TextEditingController jsController,
-    ValueNotifier<String> jsNotifier
+    TextEditingController customJsController,
+    ValueNotifier<String> customJsNotifier
     ) {
   return TextField(
-    controller: jsController,
+    controller: customJsController,
     onChanged: (value) {
-      jsNotifier.value = value;
+      customJsNotifier.value = value;
     },
     maxLines: null,
     keyboardType: TextInputType.multiline,
@@ -127,17 +127,25 @@ Widget jsInputBox(
 Widget runButton(
     ValueNotifier<String> htmlNotifier,
     ValueNotifier<String> cssNotifier,
-    ValueNotifier<String> jsNotifier,
+    ValueNotifier<String> customJsNotifier,
     BuildContext context
     ) {
   return ElevatedButton(
     child: const Text('RUN'),
     onPressed: () {
       String newHtml = htmlNotifier.value.replaceAll('</head>', '<style>${cssNotifier.value}</style></head>');
+      newHtml = newHtml.replaceAll('</body>', '</body><script>${customJsNotifier.value}</script>');
       storageUtil.writeHtml(newHtml);
 
       Completer<WebViewController> webViewController = Completer<WebViewController>();
-      Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewComponent(webViewController: webViewController, type: 'editors', storageUtil: storageUtil, jsNotifier: jsNotifier, urlNotifier: ValueNotifier(''))));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewComponent(
+        webViewController: webViewController,
+        type: 'editors',
+        expectResult: ValueNotifier(false),
+        storageUtil: storageUtil,
+        jsNotifier: ValueNotifier(''),
+        urlNotifier: ValueNotifier('')
+      )));
     },
   );
 }

@@ -15,6 +15,7 @@ Widget urlCard(
     ValueNotifier<String> urlNotifier,
     TextEditingController jsController,
     ValueNotifier<String> jsNotifier,
+    ValueNotifier<bool> expectResultNotifier,
     BuildContext context,
     ) {
   return Padding(
@@ -31,11 +32,13 @@ Widget urlCard(
             xsSpacing(orientationType.Vertical),
             urlInputBox(urlController, urlNotifier),
             sSpacing(orientationType.Vertical),
-            title('JS'),
+            title('JS (WebView)'),
             xsSpacing(orientationType.Vertical),
             jsInputBox(jsController, jsNotifier),
             xsSpacing(orientationType.Vertical),
-            runButton(urlNotifier, jsNotifier, context),
+            expectResultCheckBox(expectResultNotifier),
+            xsSpacing(orientationType.Vertical),
+            runButton(urlNotifier, jsNotifier, expectResultNotifier, context),
           ],
         ),
       ),
@@ -101,16 +104,47 @@ Widget jsInputBox(
   );
 }
 
+Widget expectResultCheckBox(ValueNotifier<bool> expectResult) {
+  return StatefulBuilder(
+    builder: (context, setState) {
+      return GestureDetector(
+        onTap: () {
+          setState(() {
+            expectResult.value = !expectResult.value;
+          });
+        },
+        child: Row(
+          children: [
+            Checkbox(
+                value: expectResult.value,
+                onChanged: (value) { setState(() { expectResult.value = value!; });},
+            ),
+            const Text('Expect Result from JS'),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 Widget runButton(
     ValueNotifier<String> urlNotifier,
     ValueNotifier<String> jsNotifier,
+    ValueNotifier<bool> expectResult,
     BuildContext context
     ) {
   return ElevatedButton(
     child: const Text('RUN'),
     onPressed: () {
       Completer<WebViewController> webViewController = Completer<WebViewController>();
-      Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewComponent(webViewController: webViewController, type: 'url', storageUtil: storageUtil, jsNotifier: jsNotifier, urlNotifier: urlNotifier)));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => WebViewComponent(
+        webViewController: webViewController,
+        type: 'url',
+        expectResult: expectResult,
+        storageUtil: storageUtil,
+        jsNotifier: jsNotifier,
+        urlNotifier: urlNotifier
+      )));
     },
   );
 }

@@ -29,6 +29,7 @@ class _HomeComponentState extends State<HomeComponent> {
 <body>
   <h1 id="hello">Hello World</h1>
   <p>This is a paragraph</p>
+  <button onclick="callAlert('Hello World')">Click Me</button>
 </body>
 </html>
 ''';
@@ -48,15 +49,14 @@ class _HomeComponentState extends State<HomeComponent> {
   TextEditingController cssController = TextEditingController();
   ValueNotifier<String> jsNotifier = ValueNotifier<String>('');
   TextEditingController jsController = TextEditingController();
+  ValueNotifier<String> customJsNotifier = ValueNotifier<String>('');
+  TextEditingController customJsController = TextEditingController();
   OrientationType orientationType = OrientationType();
+  ValueNotifier<bool> expectResultNotifier = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
-    /// Write html and css files
-    storageUtil.writeHtml(htmlTemplate);
-    storageUtil.writeCss(cssTemplate);
-
     /// Set initial notifiers and controllers values
     htmlNotifier.value = htmlTemplate;
     htmlController.text = htmlTemplate;
@@ -75,7 +75,7 @@ class _HomeComponentState extends State<HomeComponent> {
         child: Column(
           children: <Widget>[
             /// RUN WEB VIEW FROM URL
-            urlCard(urlController, urlNotifier, jsController, jsNotifier, context),
+            urlCard(urlController, urlNotifier, jsController, jsNotifier, expectResultNotifier, context),
             sSpacing(orientationType.Vertical),
             /// HTML, CSS and JS editors
             editorsCard(
@@ -83,8 +83,8 @@ class _HomeComponentState extends State<HomeComponent> {
               htmlNotifier,
               cssController,
               cssNotifier,
-              jsController,
-              jsNotifier,
+              customJsController,
+              customJsNotifier,
               context
             ),
           ],

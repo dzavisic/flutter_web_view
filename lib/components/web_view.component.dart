@@ -6,12 +6,13 @@ import 'package:flutter_web_view_private/shared/utils/storage.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class WebViewComponent extends StatefulWidget {
-  const WebViewComponent({Key? key, required this.webViewController, required this.storageUtil, required this.type, required this.jsNotifier, required this.urlNotifier}) : super(key: key);
+  const WebViewComponent({Key? key, required this.webViewController, required this.storageUtil, required this.type, required this.expectResult, required this.jsNotifier, required this.urlNotifier}) : super(key: key);
 
   final Completer<WebViewController> webViewController;
   final StorageUtil storageUtil;
   final ValueNotifier<String> jsNotifier;
   final String type;
+  final ValueNotifier<bool> expectResult;
   final ValueNotifier<String> urlNotifier;
 
   @override
@@ -23,6 +24,7 @@ class _WebViewComponentState extends State<WebViewComponent> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.expectResult.value);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Web View'),
@@ -58,11 +60,15 @@ class _WebViewComponentState extends State<WebViewComponent> {
             onPageFinished: (url) {
               if (widget.jsNotifier.value.isNotEmpty) {
                 widget.webViewController.future.then((webViewController) async {
-                  webViewController.runJavascriptReturningResult(widget.jsNotifier.value).then((result) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Console output: $result', style: const TextStyle(fontFamily: 'monospace', fontSize: 15)),
-                    ));
-                  });
+                  if (widget.expectResult.value) {
+                    webViewController.runJavascriptReturningResult(widget.jsNotifier.value).then((result) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text('Console output: $result', style: const TextStyle(fontFamily: 'monospace', fontSize: 15)),
+                      ));
+                    });
+                  } else {
+                    webViewController.runJavascript(widget.jsNotifier.value);
+                  }
                 });
               }
               setState(() {
